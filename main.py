@@ -1,7 +1,12 @@
+#JOAO ICARO MOREIRA LOIOLA -> 537176
+#MARIA JULIA SIQUEIRA -> 541577
+#MARIA EDUARDA NOGUEIRA FREITAS -> 536868
+#YLANA MARIA ARAUJO TORRES -> 541566
+
 import networkx as nx
 import matplotlib.pyplot as plt
 
-arquivo = "./G1.txt"
+arquivo = "./G2.txt"
 fig, ax = plt.subplots()
 
 def plotar(vertices, arestas, cores):
@@ -32,7 +37,7 @@ def plotar(vertices, arestas, cores):
         )
 
     plt.show(block=False)
-    plt.pause(0.5)
+    plt.pause(1.5)
     plt.close()
 
 #função que recebe um grafo como parametro 

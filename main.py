@@ -6,7 +6,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 
-arquivo = "./G2.txt"
+arquivo = "./G1.txt"
 fig, ax = plt.subplots()
 
 def plotar(vertices, arestas, cores):
@@ -37,7 +37,7 @@ def plotar(vertices, arestas, cores):
         )
 
     plt.show(block=False)
-    plt.pause(1.5)
+    plt.pause(0.5)
     plt.close()
 
 #função que recebe um grafo como parametro 
@@ -46,10 +46,6 @@ def DFS(grafo):
     cor, d, f, tipo_aresta, vm = {}, {}, {}, [], 0
     
     vertices = sorted(grafo, key=lambda v: len(grafo[v]), reverse=True)
-    # grafo e grafo[v] fornece os vizinhos do vertice v no grafo 
-    # o lambda v: len pega o vertice v e retorna o seu numero de vizinhos (grau do vertice)
-    # a ordenção foi baseada no comprimento (grau) da lista de vizinhos para cada vertice 
-    # reverse=True faz ordenação decrescente 
 
     for u in vertices:
         if cor.get(u, 'branco') == 'branco':
@@ -73,17 +69,18 @@ def DFS_VISIT(grafo, u):
             tipo_aresta.append(f"Aresta ({u}, {v}): Retorno")
         else:
             tipo_aresta.append(f"Aresta ({u}, {v}): Cruzamento")
+        # print(cor)
     cor[u] = 'preto'
     plotar(vertices_arquivo, arestas_arquivo, cor) #ICARO
     vm += 1
     f[u] = vm
 
-def ler_grafo_do_arquivo(nome_arquivo): #função para a leitura do arquivo que contém o grafo
+def ler_grafo_do_arquivo(arq): #função para a leitura do arquivo que contém o grafo
     vertices = set()
     arestas = []
     grafo = {}
 
-    with open(nome_arquivo, 'r') as arquivo:
+    with open(arq, 'r') as arquivo:
         info = arquivo.readline().split()  #lê a primeira linha que contém as informações sobre o grafo(vertices, arestas
         # e se é grafo ou digrafo)
 
@@ -96,11 +93,8 @@ def ler_grafo_do_arquivo(nome_arquivo): #função para a leitura do arquivo que 
         for _ in range(num_arestas): #leitura das arestas 
             linha = arquivo.readline().split()
 
-            if len(linha) >= 2: #verfica se tem pelo menos dois elementos que são os vértices
-                try:
-                    u, v = int(linha[0]), int(linha[1])  #converte para inteiros
-                except Exception:
-                    u, v = (linha[0], linha[1])
+            if len(linha) == 2: #verfica se tem os dois vertices na
+                u, v = (linha[0], linha[1])
                 vertices.add(u) #adiciona vértices à lista
                 vertices.add(v)
 
@@ -112,7 +106,12 @@ def ler_grafo_do_arquivo(nome_arquivo): #função para a leitura do arquivo que 
                 grafo[u].append(v)
             else:
                 print("Formato inválido em uma linha de aresta. Ignorando.")
-
+        if num_arestas == len(arestas) and num_vertices == len(vertices):
+            pass
+        else:
+            print('numero inconforme de vertices ou arestas')
+            exit()
+    print(grafo)
     return list(vertices), arestas, grafo
 
 vertices_arquivo, arestas_arquivo, grafo = ler_grafo_do_arquivo(arquivo)

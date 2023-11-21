@@ -18,27 +18,40 @@ def plotar(vertices, arestas, cores):
     GRAFO.add_edges_from(arestas)
 
     posicoes = nx.circular_layout(GRAFO)
-    nx.draw(GRAFO, posicoes, with_labels =True, font_weight="bold", node_size=700, font_size= 20, font_color="white", arrowsize=15)
-    
+    nx.draw(GRAFO, posicoes, with_labels =True, font_weight="bold", node_size=700, font_size= 20, font_color="red", arrowsize=15, node_color="red")
+
     for i in cores:
+        visited[i] = ""
+        cor = "white"
         if cores[i] == "cinza":
             cor = "gray"
         elif cores[i] == "preto":
             cor = "black"
-        else:
-            cor = "white"
+       
+        nx.draw_networkx_labels(
+            GRAFO,
+            pos=posicoes,
+            labels=visited,
+            font_size=12,
+            font_color="black",
+            font_weight="normal",
+        )
         nx.draw_networkx_nodes(
             GRAFO,
             pos=posicoes,
             nodelist=[i],
+            label=i,
             node_color=cor,
             cmap=plt.cm.Blues,
-            node_size=800,  # Ajuste o tamanho conforme necessário
+            node_size=800,
+            edgecolors= "blue" if cor == "white" else None if cor == "black" else "black",
         )
 
     plt.show(block=False)
-    plt.pause(0.5)
-    plt.close()
+    plt.pause(0.2)
+    if all(cor == "preto" for cor in cores.values()) and cores != {}:
+        plt.pause(20)
+        plt.close()
 
 #função que recebe um grafo como parametro 
 def DFS(grafo):
@@ -48,28 +61,36 @@ def DFS(grafo):
     vertices = sorted(grafo, key=lambda v: len(grafo[v]), reverse=True)
 
     for u in vertices:
-        if cor.get(u, 'branco') == 'branco':
+        plotar(vertices_arquivo, arestas_arquivo, cor)
+        cor[u] = "branco"
+        plotar(vertices_arquivo, arestas_arquivo, cor)
+
+    for u in vertices:
+        if cor.get(u) == 'branco':
             DFS_VISIT(grafo, u)
+
 #função que recebe o grafo e um vertice como parametro 
 def DFS_VISIT(grafo, u):
     global cor, d, f, tipo_aresta, vm
+    plotar(vertices_arquivo, arestas_arquivo, cor) # ICARO 
     cor[u] = 'cinza'
+    plotar(vertices_arquivo, arestas_arquivo, cor) # ICARO 
     vm += 1
     d[u] = vm
 
 #se o vertice igual a branco chamar a função visit e usando o append para inserir no final da lista
-    plotar(vertices_arquivo, arestas_arquivo, cor) # ICARO 
     for v in grafo[u]:
-        if cor.get(v, 'branco') == 'branco':
+        if cor.get(v) == 'branco':
             tipo_aresta.append(f"Aresta ({u}, {v}): Árvore")
             DFS_VISIT(grafo, v)
         elif d[u] < d.get(v, 0):
             tipo_aresta.append(f"Aresta ({u}, {v}): Avanço")
-        elif cor[v] == 'cinza':
+        elif cor.get(v) == 'cinza':
             tipo_aresta.append(f"Aresta ({u}, {v}): Retorno")
         else:
             tipo_aresta.append(f"Aresta ({u}, {v}): Cruzamento")
-        # print(cor)
+
+    plotar(vertices_arquivo, arestas_arquivo, cor) # ICARO 
     cor[u] = 'preto'
     plotar(vertices_arquivo, arestas_arquivo, cor) #ICARO
     vm += 1
@@ -106,20 +127,17 @@ def ler_grafo_do_arquivo(arq): #função para a leitura do arquivo que contém o
                 grafo[u].append(v)
             else:
                 print("Formato inválido em uma linha de aresta. Ignorando.")
-        if num_arestas == len(arestas) and num_vertices == len(vertices):
-            pass
-        else:
-            print('numero inconforme de vertices ou arestas')
-            exit()
     print(grafo)
     return list(vertices), arestas, grafo
 
 vertices_arquivo, arestas_arquivo, grafo = ler_grafo_do_arquivo(arquivo)
+visited = {i: "/" for i in grafo}
 
 DFS(grafo)
 
 print("Valores do vetor d:", d)
 print("Valores do vetor f:", f)
 print("Nomenclatura das arestas:")
+
 for aresta in tipo_aresta:
     print(aresta)
